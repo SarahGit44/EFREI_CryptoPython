@@ -1,7 +1,7 @@
 from cryptography.fernet import Fernet, InvalidToken
 from flask import Flask, render_template, request, jsonify
 
-app = Flask(_name_)
+app = Flask(__name__)  # Correction de '_name_' en '__name__'
 
 # Génération de la clé par défaut (si l'utilisateur n'en fournit pas)
 default_key = Fernet.generate_key().decode()  # Convertir en chaîne pour une utilisation facile
@@ -24,6 +24,7 @@ def encryptage(valeur):
         key = request.args.get('key', default_key)
 
         # Vérifie que la clé est valide
+        fernet = None
         try:
             fernet = Fernet(key.encode())  # Crée l'objet Fernet avec la clé
         except ValueError:
@@ -41,27 +42,4 @@ def encryptage(valeur):
 def decryptage(valeur):
     """
     Route pour décrypter la valeur.
-    L'utilisateur peut fournir une clé personnalisée via le paramètre key.
-    """
-    try:
-        # Récupère la clé personnalisée si elle est fournie, sinon utilise la clé par défaut
-        key = request.args.get('key', default_key)
-
-        # Vérifie que la clé est valide
-        try:
-            fernet = Fernet(key.encode())  # Crée l'objet Fernet avec la clé
-        except ValueError:
-            return jsonify({"error": "Clé invalide. La clé doit être une chaîne de 32 bytes encodée en base64."}), 400
-
-        # Décryptage de la valeur
-        token = valeur.encode()  # Conversion str -> bytes
-        decrypted_value = fernet.decrypt(token).decode()  # Décryptage
-        return jsonify({"decrypted_value": decrypted_value})  # Retourne la valeur décryptée
-
-    except InvalidToken:
-        return jsonify({"error": "Clé invalide ou valeur cryptée corrompue."}), 400
-    except Exception as e:
-        return jsonify({"error": f"Une erreur inattendue s'est produite : {str(e)}"}), 500
-
-if _name_ == "_main_":
-    app.run(debug=True)
+    L'utilisateur peut fournir une clé personnal
